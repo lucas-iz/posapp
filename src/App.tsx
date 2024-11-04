@@ -1,7 +1,8 @@
 import './App.css';
-import { useGeolocation, useLocationData } from './functions';
+import { useGeolocation, useLicensePlates, useLocationData } from './functions';
 import 'leaflet/dist/leaflet.css';
 import Map from './Map';
+import { useState, useEffect } from 'react';
 
 function App() {
   const {coordinates, error: geoError} = useGeolocation();
@@ -10,7 +11,22 @@ function App() {
     coordinates?.longitude ?? 0
   );
 
-  console.log("Location Data:", locationData);
+  const [licensePlates, setLicensePlates] = useState<string[]>([]);
+  const [licenseError, setLicenseError] = useState<string | null>(null);
+
+  // TODO: Load licensePlates with useLicensePlates when locationData changes...
+  const { licensePlates: fetchedLicensePlates, error: fetchedLicenseError } = useLicensePlates(locationData?.county ?? "");
+
+  useEffect(() => {
+    if (locationData) {
+      if (fetchedLicensePlates) {
+        setLicensePlates(fetchedLicensePlates);
+      }
+      if (fetchedLicenseError) {
+        setLicenseError(fetchedLicenseError);
+      }
+    }
+  }, [locationData, fetchedLicensePlates, fetchedLicenseError]);
 
   return (
     <div className='content'>
@@ -24,7 +40,11 @@ function App() {
                   <h1>{coordinates.latitude} / {coordinates.longitude}</h1>
                 </div>
                 <div className='row grow'>
-                  <div className='licensePlate'>AB - CD 123</div>
+                  {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
+                    <div className='licensePlate'>{licensePlates?.join(", ")}</div>
+                  ) : (
+                    <p>Keine Kennzeichen verfügbar</p>
+                  )}
                 </div>
                 <div className='row bottom-row'>
                   <div className='left'>

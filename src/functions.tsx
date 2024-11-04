@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import de_licensePlates from "./licensePlates";
 
 interface Coordinates {
   latitude: number;
@@ -107,4 +108,32 @@ const useLocationData = (latitude: number, longitude: number): UseLocationDataRe
   return { locationData, error };
 };
 
-export {useGeolocation, useLocationData};
+interface useLicensePlatesResult {
+  licensePlates: string[];
+  error: string | null;
+}
+
+const useLicensePlates = (givenCounty: string): useLicensePlatesResult => {
+  const [licensePlates, setLicensePlates] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      if(givenCounty === "") {
+        setLicensePlates([]);
+        setError("No county given.");
+        return;
+      }
+      const filteredPlates = de_licensePlates.filter((item) => item.county.includes(givenCounty)).map((item) => item.plate);
+      console.log(filteredPlates);
+      setLicensePlates(filteredPlates);
+      setError(null);
+    } catch(error: any) {
+      setError(error);
+    }
+  }, [givenCounty]);
+
+  return { licensePlates, error };
+};
+
+export {useGeolocation, useLocationData, useLicensePlates};

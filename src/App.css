@@ -66,5 +66,6 @@ html, body {
 }
 
 .licensePlate {
-  border: 1px dashed green;
+  /* border: 1px dashed green; */
+  font-size: 25pt;
 }
