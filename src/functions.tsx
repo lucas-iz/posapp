@@ -31,7 +31,15 @@ const useGeolocation = (): GeolocationState => {
       setError(err.message);
     };
 
-    navigator.geolocation.getCurrentPosition(success, failure);
+    // Start watching the position continuously
+    const watchId = navigator.geolocation.watchPosition(success, failure, {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 10000,
+    });
+
+    // Clear the watcher on component unmount
+    return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
   return { coordinates, error };
