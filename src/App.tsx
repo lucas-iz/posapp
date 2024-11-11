@@ -13,6 +13,8 @@ function App() {
 
   const [licensePlates, setLicensePlates] = useState<string[]>([]);
   const [licenseError, setLicenseError] = useState<string | null>(null);
+  const [prevPosition, setPrevPosition] = useState<number[]>([0,0]);
+  const [speed, setSpeed] = useState<number>(0);
 
   // TODO: Load licensePlates with useLicensePlates when locationData changes...
   const { licensePlates: fetchedLicensePlates, error: fetchedLicenseError } = useLicensePlates(locationData?.county ?? "");
@@ -28,6 +30,19 @@ function App() {
     }
   }, [locationData, fetchedLicensePlates, fetchedLicenseError]);
 
+  useEffect(() => {
+    const prevLat = prevPosition[0];
+    const prevLng = prevPosition[1];
+
+    if(prevLat != coordinates?.latitude && prevLng != coordinates?.longitude) {
+      setSpeed(1);
+    }
+    else {
+      setSpeed(-1);
+    }
+
+  }, [prevPosition, coordinates]);
+
   return (
     <div className='content'>
       {geoError ? (
@@ -37,9 +52,10 @@ function App() {
             {coordinates ? (
               <div className='mainData'>
                 <div className='row top-row'>
-                  <h1>{coordinates.latitude} / {coordinates.longitude}</h1>
+                  <h1>{coordinates.latitude} <br /> {coordinates.longitude}</h1>
                 </div>
                 <div className='row grow'>
+                  <p>{speed} km/h</p><br />
                   {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
                     <div className='licensePlate'>{licensePlates?.join(", ")}</div>
                   ) : (
