@@ -165,7 +165,10 @@ const calculateSpeed = (lat1: number, lng1: number, time1: Date, lat2: number, l
   const distance = calculateDistance(lat1, lng1, lat2, lng2);
 
   // Berechne die Geschwindigkeit
-  return distance / timeDifference; // Geschwindigkeit in km/h
+  const speed_kmh: number = distance / timeDifference; // Geschwindigkeit in km/h
+  const speed_rounded = parseFloat(speed_kmh.toFixed(2));
+
+  return speed_rounded; 
 };
 
 export {useGeolocation, useLocationData, useLicensePlates, calculateSpeed};
