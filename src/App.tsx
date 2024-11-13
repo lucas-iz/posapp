@@ -83,12 +83,14 @@ function App() {
                   <h1>{coordinates.latitude} <br /> {coordinates.longitude}</h1>
                 </div>
                 <div className='row grow'>
-                  <div className='licensePlate'>{speed} km/h</div>
-                  {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
-                    <div className='licensePlate'>{licensePlates?.join(", ")}</div>
-                  ) : (
-                    <p>Keine Kennzeichen verfügbar</p>
-                  )}
+                  <div className='row container'>
+                    <div className='licensePlate'>{speed} km/h</div>
+                    {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
+                      <div className='licensePlate'>{licensePlates?.join(", ")}</div>
+                    ) : (
+                      <p>Keine Kennzeichen verfügbar</p>
+                    )}
+                  </div>
                 </div>
                 <div className='row bottom-row'>
                   <div className='left'>
