@@ -166,7 +166,7 @@ const calculateSpeed = (lat1: number, lng1: number, time1: Date, lat2: number, l
 
   // Berechne die Geschwindigkeit
   const speed_kmh: number = distance / timeDifference; // Geschwindigkeit in km/h
-  const speed_rounded = parseFloat(speed_kmh.toFixed(2));
+  const speed_rounded = parseFloat(speed_kmh.toFixed(0));
 
   return speed_rounded; 
 };
