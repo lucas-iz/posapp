@@ -1,8 +1,14 @@
 import './App.css';
-import { useGeolocation, useLicensePlates, useLocationData } from './functions';
+import { calculateSpeed, useGeolocation, useLicensePlates, useLocationData } from './functions';
 import 'leaflet/dist/leaflet.css';
 import Map from './Map';
 import { useState, useEffect } from 'react';
+
+interface PositionData {
+  latitude: number,
+  longitude: number,
+  time: Date
+};
 
 function App() {
   const {coordinates, error: geoError} = useGeolocation();
@@ -13,12 +19,47 @@ function App() {
 
   const [licensePlates, setLicensePlates] = useState<string[]>([]);
   const [licenseError, setLicenseError] = useState<string | null>(null);
-  const [prevPosition, setPrevPosition] = useState<number[]>([0,0]);
   const [speed, setSpeed] = useState<number>(0);
+  const [lastPositions, setLastPositions] = useState<PositionData[]>([]);
 
   // TODO: Load licensePlates with useLicensePlates when locationData changes...
-  const { licensePlates: fetchedLicensePlates, error: fetchedLicenseError } = useLicensePlates(locationData?.county ?? "");
+  const { licensePlates: fetchedLicensePlates, error: fetchedLicenseError } = useLicensePlates(locationData?.county || (locationData?.city || ""));
 
+  // Set positions and speed
+  useEffect(() => {
+    const newData: PositionData = {
+      latitude: coordinates?.latitude ?? 0, 
+      longitude: coordinates?.longitude ?? 0, 
+      time: new Date()
+    };
+    const positions = lastPositions;
+
+    // If >=2, Remove oldest position
+    if(positions.length >= 2) {
+      positions.shift(); // Removes first entry in array
+    }
+
+    // Add newest position
+    positions.push(newData);
+    
+    // Calculate speed using both values
+    if(positions.length >= 2) {
+      const prevPos: PositionData = positions[0];
+      const currPos: PositionData = positions[1];
+      const tmp_speed: number = calculateSpeed(
+        prevPos.latitude, prevPos.longitude, prevPos.time,
+        currPos.latitude, currPos.longitude, currPos.time
+      )
+      setSpeed(tmp_speed);
+    }
+    else {
+      setSpeed(0);
+    }
+
+    setLastPositions(positions);
+  }, [coordinates]);
+
+  // Set license plates
   useEffect(() => {
     if (locationData) {
       if (fetchedLicensePlates) {
@@ -29,19 +70,6 @@ function App() {
       }
     }
   }, [locationData, fetchedLicensePlates, fetchedLicenseError]);
-
-  useEffect(() => {
-    const prevLat = prevPosition[0];
-    const prevLng = prevPosition[1];
-
-    if(prevLat != coordinates?.latitude && prevLng != coordinates?.longitude) {
-      setSpeed(1);
-    }
-    else {
-      setSpeed(-1);
-    }
-
-  }, [prevPosition, coordinates]);
 
   return (
     <div className='content'>
@@ -55,7 +83,7 @@ function App() {
                   <h1>{coordinates.latitude} <br /> {coordinates.longitude}</h1>
                 </div>
                 <div className='row grow'>
-                  <p>{speed} km/h</p><br />
+                  <div className='licensePlate'>{speed} km/h</div>
                   {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
                     <div className='licensePlate'>{licensePlates?.join(", ")}</div>
                   ) : (

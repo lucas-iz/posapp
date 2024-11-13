@@ -136,4 +136,36 @@ const useLicensePlates = (givenCounty: string): useLicensePlatesResult => {
   return { licensePlates, error };
 };
 
-export {useGeolocation, useLocationData, useLicensePlates};
+// Hilfsfunktion zur Berechnung der Entfernung zwischen zwei Koordinaten (in Kilometern)
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371; // Radius der Erde in Kilometern
+  const toRad = (value: number) => (value * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lng2 - lng1);
+
+  const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Entfernung in Kilometern
+}
+
+const calculateSpeed = (lat1: number, lng1: number, time1: Date, lat2: number, lng2: number, time2: Date): number => {
+  if(lat1 == null || lng1 == null || lat2 == null || lng2 == null) {
+    return -1;
+  }
+  
+  // Berechne die Zeitdifferenz in Stunden
+  const timeDifference = (time2.getTime() - time1.getTime()) / (1000 * 60 * 60); // in Stunden
+
+  // Berechne die Entfernung zwischen den beiden Punkten
+  const distance = calculateDistance(lat1, lng1, lat2, lng2);
+
+  // Berechne die Geschwindigkeit
+  return distance / timeDifference; // Geschwindigkeit in km/h
+};
+
+export {useGeolocation, useLocationData, useLicensePlates, calculateSpeed};
