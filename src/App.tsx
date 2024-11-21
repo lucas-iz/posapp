@@ -7,7 +7,10 @@ import { useState, useEffect } from 'react';
 interface PositionData {
   latitude: number,
   longitude: number,
-  time: Date
+  time: Date,
+  speed: number | null,
+  heading: number | null,
+  altitude: number | null,
 };
 
 function App() {
@@ -19,7 +22,7 @@ function App() {
 
   const [licensePlates, setLicensePlates] = useState<string[]>([]);
   const [licenseError, setLicenseError] = useState<string | null>(null);
-  const [speed, setSpeed] = useState<number>(0);
+  // const [speed, setSpeed] = useState<number>(0);
   const [lastPositions, setLastPositions] = useState<PositionData[]>([]);
 
   // TODO: Load licensePlates with useLicensePlates when locationData changes...
@@ -30,7 +33,10 @@ function App() {
     const newData: PositionData = {
       latitude: coordinates?.latitude ?? 0, 
       longitude: coordinates?.longitude ?? 0, 
-      time: new Date()
+      time: new Date(),
+      speed: (coordinates?.speed ?? null),
+      heading: (coordinates?.heading ?? null),
+      altitude: (coordinates?.altitude ?? null),
     };
     const positions = lastPositions;
 
@@ -42,6 +48,7 @@ function App() {
     // Add newest position
     positions.push(newData);
     
+    /*
     // Calculate speed using both values
     if(positions.length >= 2) {
       const prevPos: PositionData = positions[0];
@@ -55,6 +62,7 @@ function App() {
     else {
       setSpeed(0);
     }
+    */
 
     setLastPositions(positions);
   }, [coordinates]);
@@ -84,7 +92,11 @@ function App() {
                 </div>
                 <div className='row grow'>
                   <div className='row container'>
-                    <div className='licensePlate'>{speed} km/h</div>
+                    {lastPositions[1].speed ? (
+                      <div className='licensePlate'>{lastPositions[1].heading} km/h</div>
+                    ) : (
+                      <div className='licensePlate no-speed'>No Speed value</div>
+                    )}
                     {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
                       <div className='licensePlate'>{licensePlates?.join(", ")}</div>
                     ) : (

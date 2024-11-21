@@ -4,6 +4,9 @@ import de_licensePlates from "./licensePlates";
 interface Coordinates {
   latitude: number;
   longitude: number;
+  speed: number | null;
+  heading: number | null;
+  altitude: number | null;
 }
 
 interface GeolocationState {
@@ -25,6 +28,9 @@ const useGeolocation = (): GeolocationState => {
       setCoordinates({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
+        speed: position.coords.speed,
+        heading: position.coords.heading,
+        altitude: position.coords.altitude,
       });
     };
 
