@@ -22,7 +22,7 @@ function App() {
 
   const [licensePlates, setLicensePlates] = useState<string[]>([]);
   const [licenseError, setLicenseError] = useState<string | null>(null);
-  // const [speed, setSpeed] = useState<number>(0);
+  const [speed, setSpeed] = useState<number>(0);
   const [lastPositions, setLastPositions] = useState<PositionData[]>([]);
 
   // TODO: Load licensePlates with useLicensePlates when locationData changes...
@@ -48,7 +48,6 @@ function App() {
     // Add newest position
     positions.push(newData);
     
-    /*
     // Calculate speed using both values
     if(positions.length >= 2) {
       const prevPos: PositionData = positions[0];
@@ -62,7 +61,6 @@ function App() {
     else {
       setSpeed(0);
     }
-    */
 
     setLastPositions(positions);
   }, [coordinates]);
@@ -91,18 +89,12 @@ function App() {
                   <h1>{coordinates.latitude} <br /> {coordinates.longitude}</h1>
                 </div>
                 <div className='row grow'>
-                  <div className='row container'>
-                    {lastPositions[1].speed ? (
-                      <div className='licensePlate'>{lastPositions[1].heading} km/h</div>
-                    ) : (
-                      <div className='licensePlate no-speed'>No Speed value</div>
-                    )}
-                    {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
-                      <div className='licensePlate'>{licensePlates?.join(", ")}</div>
-                    ) : (
-                      <p>Keine Kennzeichen verfügbar</p>
-                    )}
-                  </div>
+                  <div className='licensePlate'>{speed} km/h</div>
+                  {locationError ? (<p>Kein Kennzeichen verfügbar</p>) : locationData ? (
+                    <div className='licensePlate'>{licensePlates?.join(", ")}</div>
+                  ) : (
+                    <p>Keine Kennzeichen verfügbar</p>
+                  )}
                 </div>
                 <div className='row bottom-row'>
                   <div className='left'>
